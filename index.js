@@ -44,6 +44,7 @@ function handleClick(e) {
     } else if (isDraw()) {
         endGame(true);
     } else {
+        disableClicks(); // Desabilitar cliques durante a jogada da IA
         setBoardHoverClass();
         setTimeout(() => {
             makeComputerMove();
@@ -52,6 +53,7 @@ function handleClick(e) {
             } else if (isDraw()) {
                 endGame(true);
             } else {
+                enableClicks(); // Reabilitar cliques após a jogada da IA
                 setBoardHoverClass();
             }
         }, 500);
@@ -107,4 +109,18 @@ function makeComputerMove() {
     const randomIndex = Math.floor(Math.random() * availableCells.length);
     const cell = availableCells[randomIndex];
     placeMark(cell, O_CLASS);
+}
+
+function disableClicks() {
+    cellElements.forEach(cell => {
+        cell.removeEventListener('click', handleClick);
+    });
+}
+
+function enableClicks() {
+    cellElements.forEach(cell => {
+        if (!cell.classList.contains(X_CLASS) && !cell.classList.contains(O_CLASS)) {
+            cell.addEventListener('click', handleClick, { once: true });
+        }
+    });
 }
