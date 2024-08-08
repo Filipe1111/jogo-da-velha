@@ -1,10 +1,11 @@
 body {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  min-height: 100vh;
   margin: 0;
-  background-color: #333;
+  background-color: #87CEFA; /* Azul claro */
   font-family: 'Arial', sans-serif;
 }
 
@@ -12,6 +13,7 @@ body {
   display: grid;
   grid-template-columns: repeat(3, 100px);
   grid-gap: 5px;
+  margin-top: 100px; /* Aumenta a margem superior para descer o jogo mais um pouco */
 }
 
 .cell {
@@ -59,4 +61,14 @@ body {
   padding: 10px 20px;
   font-size: 16px;
   cursor: pointer;
+}
+
+footer {
+  margin-top: auto;
+  padding: 10px;
+  text-align: center;
+  background-color: #222;
+  color: #fff;
+  width: 100%;
+  font-size: smaller;
 }
