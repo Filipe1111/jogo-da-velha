@@ -32,7 +32,6 @@ function startGame() {
     });
     setBoardHoverClass();
     winningMessageElement.classList.remove('show');
-    console.log("Jogo iniciado");
 }
 
 function handleClick(e) {
@@ -44,7 +43,7 @@ function handleClick(e) {
     } else if (isDraw()) {
         endGame(true);
     } else {
-        disableClicks(); // Desabilitar cliques durante a jogada da IA
+        disableClicks();
         setBoardHoverClass();
         setTimeout(() => {
             makeComputerMove();
@@ -53,7 +52,7 @@ function handleClick(e) {
             } else if (isDraw()) {
                 endGame(true);
             } else {
-                enableClicks(); // Reabilitar cliques após a jogada da IA
+                enableClicks();
                 setBoardHoverClass();
             }
         }, 500);
@@ -67,7 +66,6 @@ function endGame(draw, currentClass) {
         winningMessageTextElement.innerText = `${currentClass === X_CLASS ? "X" : "O"} Venceu!`;
     }
     winningMessageElement.classList.add('show');
-    console.log("Fim do jogo");
 }
 
 function isDraw() {
@@ -78,7 +76,6 @@ function isDraw() {
 
 function placeMark(cell, currentClass) {
     cell.classList.add(currentClass);
-    console.log(`Marca colocada: ${currentClass}`);
 }
 
 function setBoardHoverClass() {
@@ -100,15 +97,68 @@ function checkWin(currentClass) {
 }
 
 function makeComputerMove() {
-    const availableCells = [...cellElements].filter(cell => {
-        return !cell.classList.contains(X_CLASS) && !cell.classList.contains(O_CLASS);
-    });
+    const bestMove = getBestMove();
+    if (bestMove !== null) {
+        placeMark(cellElements[bestMove], O_CLASS);
+    }
+}
 
-    if (availableCells.length === 0) return;
+function getBestMove() {
+    let bestScore = -Infinity;
+    let bestMove = null;
 
-    const randomIndex = Math.floor(Math.random() * availableCells.length);
-    const cell = availableCells[randomIndex];
-    placeMark(cell, O_CLASS);
+    for (let i = 0; i < cellElements.length; i++) {
+        if (!cellElements[i].classList.contains(X_CLASS) && !cellElements[i].classList.contains(O_CLASS)) {
+            cellElements[i].classList.add(O_CLASS);
+            let score = minimax(cellElements, 0, false);
+            cellElements[i].classList.remove(O_CLASS);
+
+            if (score > bestScore) {
+                bestScore = score;
+                bestMove = i;
+            }
+        }
+    }
+
+    return bestMove;
+}
+
+function minimax(cells, depth, isMaximizing) {
+    const scores = {
+        [X_CLASS]: -10,
+        [O_CLASS]: 10,
+        tie: 0
+    };
+
+    let result = checkWin(X_CLASS) ? scores[X_CLASS] :
+                 checkWin(O_CLASS) ? scores[O_CLASS] :
+                 isDraw() ? scores.tie : null;
+
+    if (result !== null) return result;
+
+    if (isMaximizing) {
+        let bestScore = -Infinity;
+        for (let i = 0; i < cells.length; i++) {
+            if (!cells[i].classList.contains(X_CLASS) && !cells[i].classList.contains(O_CLASS)) {
+                cells[i].classList.add(O_CLASS);
+                let score = minimax(cells, depth + 1, false);
+                cells[i].classList.remove(O_CLASS);
+                bestScore = Math.max(score, bestScore);
+            }
+        }
+        return bestScore;
+    } else {
+        let bestScore = Infinity;
+        for (let i = 0; i < cells.length; i++) {
+            if (!cells[i].classList.contains(X_CLASS) && !cells[i].classList.contains(O_CLASS)) {
+                cells[i].classList.add(X_CLASS);
+                let score = minimax(cells, depth + 1, true);
+                cells[i].classList.remove(X_CLASS);
+                bestScore = Math.min(score, bestScore);
+            }
+        }
+        return bestScore;
+    }
 }
 
 function disableClicks() {
